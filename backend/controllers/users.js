@@ -50,7 +50,7 @@ const createUser = (req, res) => {
 //обновление данных пользователя
 const updateProfile = (req, res) => {
   const { name, about } = req.body;
-  return User.findByIdAndUpdate(req.user._id, { name, about })
+  return User.findByIdAndUpdate(req.user._id, { name, about }, { new: true })
     .then((user) => {
       return res.status(200).send(user)
     })
@@ -70,7 +70,7 @@ const updateProfile = (req, res) => {
 //обновление аватара
 const updateAvatar = (req, res) => {
   const { avatar } = req.body;
-  return User.findByIdAndUpdate(req.user._id, { avatar })
+  return User.findByIdAndUpdate(req.user._id, { avatar }, { new: true })
     .then((user) => {
       return res.status(200).send(user)
     })
