@@ -23,8 +23,10 @@ const getUser = (req, res) => {
       res.status(201).send(user);
     })
     .catch((err) => {
-      if (err.name === 'CastError') {
+      if (err.statusCode === 404) {
         res.status(404).send({ message: `Ошибка ${notFoundError}: пользователя с переданным идентификатором не существует` });
+      } else if (err.name === 'CastError') {
+        res.status(400).send({ message: `Ошибка ${validationError}: переданы некорректные данные пользователя` });
       } else {
         res.status(500).send({ message: 'произошла ошибка на сервере' });
       }
@@ -39,7 +41,7 @@ const createUser = (req, res) => {
       res.status(200).send({ data: user });
     })
     .catch((err) => {
-      if (err.name === 'ValidationError') {
+      if (err.name === 'CastError') {
         res.status(400).send({ message: `Ошибка ${validationError}: переданы некорректные данные при создании пользователя` });
       } else {
         res.status(500).send({ message: 'произошла ошибка на сервере' });
@@ -60,9 +62,9 @@ const updateProfile = (req, res) => {
       res.status(200).send(user);
     })
     .catch((err) => {
-      if (err.name === 'ValidationError') {
+      if (err.name === 'CastError') {
         res.status(400).send({ message: `Ошибка ${validationError}: переданы некорректные данные пользователя` });
-      } else if (err.name === 'searchError') {
+      } else if (err.statusCode === 404) {
         res.status(404).send({ message: `Ошибка ${notFoundError}: пользователя с переданным идентификатором не существует` });
       } else {
         res.status(500).send({ message: 'произошла ошибка на сервере' });
@@ -83,9 +85,9 @@ const updateAvatar = (req, res) => {
       res.status(200).send(user);
     })
     .catch((err) => {
-      if (err.name === 'ValidationError') {
+      if (err.name === 'CastError') {
         res.status(400).send({ message: `Ошибка ${validationError}: переданы некорректные данные пользователя` });
-      } else if (err.name === 'castError') {
+      } else if (err.statusCode === 404) {
         res.status(404).send({ message: `Ошибка ${notFoundError}: пользователя с переданным идентификатором не существует` });
       } else {
         res.status(500).send({ message: 'произошла ошибка на сервере' });

@@ -23,7 +23,7 @@ const createCard = (req, res) => {
       res.status(201).send(card);
     })
     .catch((err) => {
-      if (err.name === 'ValidationError') {
+      if (err.name === 'CastError') {
         res.status(400).send({ message: `Ошибка при создании карточки ${validationError}: переданы некорректные данные` });
       } else {
         res.status(500).send({ message: 'произошла ошибка на сервере' });
@@ -44,8 +44,8 @@ const deleteCard = (req, res) => {
       res.status(200).send(card);
     })
     .catch((err) => {
-      if (err.name === 'CastError') {
-        res.status(404).send({ message: `Ошибка при удалении карточки ${notFoundError}: карточки с переданным идентификатором не существует` });
+      if (err.statusCode === 404) {
+        res.status(404).send({ message: `Ошибка ${notFoundError}: такой карточки не существует` });
       } else {
         res.status(500).send({ message: 'произошла ошибка на сервере' });
       }
@@ -68,10 +68,10 @@ const putLike = (req, res) => {
       res.status(200).send(card);
     })
     .catch((err) => {
-      if (err.name === 'ValidationError') {
+      if (err.name === 'CastError') {
         res.status(400).send({ message: `Ошибка ${validationError}: Переданы некорректные данные при постановке лайка` });
-      } else if (err.name === 'CastError') {
-        res.status(404).send({ message: `Ошибка при постановке лайка ${notFoundError}: карточки с переданным идентификатором не существует` });
+      } else if (err.statusCode === 404) {
+        res.status(404).send({ message: `Ошибка ${notFoundError}: такой карточки не существует` });
       } else {
         res.status(500).send({ message: 'произошла ошибка на сервере' });
       }
@@ -92,10 +92,10 @@ const deleteLike = (req, res) => {
       res.status(200).send(card);
     })
     .catch((err) => {
-      if (err.name === 'ValidationError') {
+      if (err.name === 'CastError') {
         res.status(400).send({ message: `Ошибка ${validationError}: переданы некорректные данные при снятии лайка` });
-      } else if (err.name === 'CastError') {
-        res.status(404).send({ message: `Ошибка при снятии лайка ${notFoundError}: карточки с переданным идентификатором не существует` });
+      } else if (err.statusCode === 404) {
+        res.status(404).send({ message: `Ошибка ${notFoundError}: такой карточки не существует` });
       } else {
         res.status(500).send({ message: 'произошла ошибка на сервере' });
       }
