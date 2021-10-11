@@ -92,7 +92,7 @@ const deleteLike = (req, res) => {
       res.status(200).send(card);
     })
     .catch((err) => {
-      if (err.name === 'CastError') {
+      if (err.name === 'ValidationError') {
         res.status(400).send({ message: `Ошибка ${validationError}: переданы некорректные данные при снятии лайка` });
       } else if (err.statusCode === 404) {
         res.status(404).send({ message: `Ошибка ${notFoundError}: такой карточки не существует` });
