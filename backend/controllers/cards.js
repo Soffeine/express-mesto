@@ -41,7 +41,9 @@ const deleteCard = (req, res) => {
       throw error;
     })
     .then((card) => {
-      res.status(200).send(card);
+      if (req.user._id === card.owner._id) {
+        res.status(200).send(card);
+      }
     })
     .catch((err) => {
       if (err.statusCode === 404) {
