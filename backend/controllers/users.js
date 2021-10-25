@@ -5,6 +5,7 @@ const User = require('../models/user');
 const ValidationError = require('../errors/bad-request-error');
 const NotFoundError = require('../errors/not-found-error');
 const ConflictError = require('../errors/conflict-error');
+const AuthError = require('../errors/auth-error');
 
 // получение данных о всех пользователях
 const getUsers = (req, res, next) => {
@@ -13,11 +14,20 @@ const getUsers = (req, res, next) => {
     .catch(next);
 };
 
+// получение данных о текущем пользователе
+const getCurrentUser = (req, res, next) => {
+  User.findById(req.user._id)
+    .then((user) => {
+      res.status(201).send(user);
+    })
+    .catch(next);
+};
+
 // получение данных о конкретном пользователе с помощью айди
 const getUser = (req, res, next) => {
   const { _id } = req.params;
   return User.findById(_id)
-    .orFail(() => new NotFoundError('Такой карточки не существует'))
+    .orFail(() => new NotFoundError('Такого ользователя не существует'))
     .then((user) => {
       res.status(201).send(user);
     })
@@ -42,7 +52,7 @@ const createUser = (req, res, next) => {
     email,
     password,
   } = req.body;
-  bcrypt.hash({ password }, 10)
+  bcrypt.hash(password, 10)
     .then((hash) => User.create({
       name,
       about,
@@ -51,7 +61,7 @@ const createUser = (req, res, next) => {
       password: hash,
     }))
     .then((user) => {
-      res.status(200).send({ data: user });
+      res.status(200).send(user.name, user.about, user.avatar, user.email);
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
@@ -113,33 +123,37 @@ const updateAvatar = (req, res, next) => {
     .catch(next);
 };
 
-const login = (req, res) => {
+const login = (req, res, next) => {
   const { email, password } = req.body;
   User.findOne({ email }).select('+password')
     .then((user) => {
       if (!user) {
         return Promise.reject(new Error('Неправильные почта или пароль'));
       }
-      return bcrypt.compare(password, user.password);
+      return bcrypt.compare(password, user.password)
+        .then((matched) => {
+          if (!matched) {
+            Promise.reject(new Error('Неправильные почта или пароль'));
+          }
+          return user;
+        });
     })
-    .then((matched) => {
-      if (!matched) {
-        Promise.reject(new Error('Неправильные почта или пароль'));
-      }
+    .then((user) => {
       const token = jwt.sign(
-        { _id: User._id },
+        { _id: user._id },
         'super-secret-key',
         { expiresIn: '7d' },
       );
       res.send({ token });
-      res.cookie('jwt', token, {
-        maxAge: 3600000,
-        httpOnly: true,
-      });
     })
     .catch((err) => {
-      res.status(401).send({ message: err.message });
-    });
+      if (err.statusCode === 401) {
+        next(new AuthError('Ошибка авторизаци'));
+      } else {
+        next(err);
+      }
+    })
+    .catch(next);
 };
 
 module.exports = {
@@ -149,4 +163,5 @@ module.exports = {
   updateProfile,
   updateAvatar,
   login,
+  getCurrentUser,
 };
