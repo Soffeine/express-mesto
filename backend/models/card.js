@@ -1,6 +1,5 @@
 const mongoose = require('mongoose');
-
-const regex = /https?:\/\/\/w*\w/;
+const validator = require('validator');
 
 const cardSchema = new mongoose.Schema({
   name: {
@@ -12,10 +11,12 @@ const cardSchema = new mongoose.Schema({
   link: {
     type: String,
     required: true,
-    validator(val) {
-      return val.match(regex);
+    validate: {
+      validator(v) {
+        return validator.isURL(v);
+      },
+      message: 'Здесь должна быть ссылка',
     },
-    message: 'Невалидная ссылка',
   },
   owner: {
     type: mongoose.Schema.Types.ObjectId,

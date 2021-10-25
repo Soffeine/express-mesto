@@ -9,6 +9,9 @@ const userRoutes = require('./routes/users');
 const cardRoutes = require('./routes/cards');
 const { login, createUser } = require('./controllers/users');
 const { auth } = require('./middlewares/auth');
+const { loginValidation, signupValidation } = require('./middlewares/validation');
+
+const NotFoundError = require('./errors/not-found-error');
 
 mongoose.connect('mongodb://localhost:27017/mestodb', {
   useNewUrlParser: true,
@@ -16,26 +19,25 @@ mongoose.connect('mongodb://localhost:27017/mestodb', {
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
-app.post('/signup', createUser);
-app.post('/signin', login);
+app.post('/signup', signupValidation, createUser);
+app.post('/signin', loginValidation, login);
 
 app.use(auth);
 
 app.use('/users', userRoutes);
 app.use('/cards', cardRoutes);
-app.use((req, res) => {
-  res.status(404).send({ message: 'Такого запроса не существует' });
+app.use((req, res, next) => {
+  next(new NotFoundError('Такого запроса не существует'));
 });
 
 app.use(errors());
 
 app.use((err, req, res, next) => {
-  const status = err.statusCode;
-  const { message } = err;
+  const { statusCode = 500, message } = err;
 
-  res.status(status).send({
-    message: status === 500
-      ? 'Произошла ошибка на сервере'
+  res.status(statusCode).send({
+    message: statusCode === 500
+      ? 'На сервере произошла ошибка'
       : message,
   });
   next();

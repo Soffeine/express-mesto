@@ -2,41 +2,39 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../models/user');
 
-const validationError = 400;
-const notFoundError = 404;
+const ValidationError = require('../errors/bad-request-error');
+const NotFoundError = require('../errors/not-found-error');
+const ConflictError = require('../errors/conflict-error');
 
 // получение данных о всех пользователях
-const getUsers = (req, res) => {
+const getUsers = (req, res, next) => {
   User.find({})
     .then((users) => res.status(200).send(users))
-    .catch((err) => res.status(500).send({ message: `Произошла ошибка на сервере ${err}` }));
+    .catch(next);
 };
 
 // получение данных о конкретном пользователе с помощью айди
-const getUser = (req, res) => {
+const getUser = (req, res, next) => {
   const { _id } = req.params;
   return User.findById(_id)
-    .orFail(() => {
-      const error = new Error('Пользователя с данным id не существует');
-      error.statusCode = 404;
-      throw error;
-    })
+    .orFail(() => new NotFoundError('Такой карточки не существует'))
     .then((user) => {
       res.status(201).send(user);
     })
     .catch((err) => {
       if (err.statusCode === 404) {
-        res.status(404).send({ message: `Ошибка ${notFoundError}: пользователя с переданным идентификатором не существует` });
+        next(new NotFoundError('Такого пользователя не существует'));
       } else if (err.name === 'CastError') {
-        res.status(400).send({ message: `Ошибка ${validationError}: переданы некорректные данные пользователя` });
+        next(new ValidationError('Переданы некорректные данные'));
       } else {
-        res.status(500).send({ message: 'произошла ошибка на сервере' });
+        next(err);
       }
-    });
+    })
+    .catch(next);
 };
 
 // создание аккаунта
-const createUser = (req, res) => {
+const createUser = (req, res, next) => {
   const {
     name,
     about,
@@ -57,15 +55,18 @@ const createUser = (req, res) => {
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        res.status(400).send({ message: `Ошибка ${validationError}: переданы некорректные данные при создании пользователя` });
+        next(new ValidationError('переданы некорректные данные при создании пользователя'));
+      } else if (err.statusCode === 409) {
+        next(new ConflictError('Пользователь с такой почтой уже существует'));
       } else {
-        res.status(500).send({ message: 'произошла ошибка на сервере' });
+        next(err);
       }
-    });
+    })
+    .catch(next);
 };
 
 // обновление данных пользователя
-const updateProfile = (req, res) => {
+const updateProfile = (req, res, next) => {
   const { name, about } = req.body;
   return User.findByIdAndUpdate(req.user._id, { name, about }, { new: true, runValidators: true })
     .orFail(() => {
@@ -78,17 +79,18 @@ const updateProfile = (req, res) => {
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        res.status(400).send({ message: `Ошибка ${validationError}: переданы некорректные данные пользователя` });
+        next(new ValidationError('переданы некорректные данные при создании пользователя'));
       } else if (err.statusCode === 404) {
-        res.status(404).send({ message: `Ошибка ${notFoundError}: пользователя с переданным идентификатором не существует` });
+        next(new NotFoundError('Такого пользователя не существует'));
       } else {
-        res.status(500).send({ message: 'произошла ошибка на сервере' });
+        next(err);
       }
-    });
+    })
+    .catch(next);
 };
 
 // обновление аватара
-const updateAvatar = (req, res) => {
+const updateAvatar = (req, res, next) => {
   const { avatar } = req.body;
   return User.findByIdAndUpdate(req.user._id, { avatar }, { new: true, runValidators: true })
     .orFail(() => {
@@ -101,13 +103,14 @@ const updateAvatar = (req, res) => {
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        res.status(400).send({ message: `Ошибка ${validationError}: переданы некорректные данные пользователя` });
+        next(new ValidationError('переданы некорректные данные при создании пользователя'));
       } else if (err.statusCode === 404) {
-        res.status(404).send({ message: `Ошибка ${notFoundError}: пользователя с переданным идентификатором не существует` });
+        next(new NotFoundError('Такого пользователя не существует'));
       } else {
-        res.status(500).send({ message: 'произошла ошибка на сервере' });
+        next(err);
       }
-    });
+    })
+    .catch(next);
 };
 
 const login = (req, res) => {

@@ -1,8 +1,6 @@
 const mongoose = require('mongoose');
 const { validator } = require('validator');
 
-const regex = /https?:\/\/\/w*\w/;
-
 const userSchema = new mongoose.Schema({
   email: {
     type: String,
@@ -16,7 +14,6 @@ const userSchema = new mongoose.Schema({
   password: {
     type: String,
     required: true,
-    minlength: 8,
     select: false,
   },
   name: {
@@ -35,10 +32,10 @@ const userSchema = new mongoose.Schema({
     type: String,
     default: 'https://pictures.s3.yandex.net/resources/jacques-cousteau_1604399756.png',
     validate: {
-      validator(val) {
-        return val.match(regex);
+      validator(v) {
+        return validator.isURL(v);
       },
-      message: 'Невалидная ссылка',
+      message: 'Здесь должна быть ссылка',
     },
   },
 });
