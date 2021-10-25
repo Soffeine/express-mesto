@@ -128,7 +128,7 @@ const login = (req, res) => {
       }
       const token = jwt.sign(
         { _id: User._id },
-        'some-secret-key',
+        'super-secret-key',
         { expiresIn: '7d' },
       );
       res.send({ token });
