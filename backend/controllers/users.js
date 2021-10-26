@@ -61,12 +61,17 @@ const createUser = (req, res, next) => {
       password: hash,
     }))
     .then((user) => {
-      res.status(200).send(user.name, user.about, user.avatar, user.email);
+      res.status(200).send({
+        name: user.name,
+        about: user.about,
+        avatar: user.avatar,
+        email: user.email,
+      });
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
         next(new ValidationError('переданы некорректные данные при создании пользователя'));
-      } else if (err.statusCode === 409) {
+      } else if (err.code === 11000 && err.name === 'MongoError') {
         next(new ConflictError('Пользователь с такой почтой уже существует'));
       } else {
         next(err);
@@ -133,7 +138,7 @@ const login = (req, res, next) => {
       return bcrypt.compare(password, user.password)
         .then((matched) => {
           if (!matched) {
-            Promise.reject(new Error('Неправильные почта или пароль'));
+            return Promise.reject(new Error('Неправильные почта или пароль'));
           }
           return user;
         });
@@ -147,11 +152,7 @@ const login = (req, res, next) => {
       res.send({ token });
     })
     .catch((err) => {
-      if (err.statusCode === 401) {
-        next(new AuthError('Ошибка авторизаци'));
-      } else {
-        next(err);
-      }
+      next(new AuthError(err.message));
     })
     .catch(next);
 };
