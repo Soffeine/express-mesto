@@ -3,21 +3,21 @@ const express = require('express');
 const PORT = 3000;
 const cors = require('cors');
 
-const options = {
-  origin: [
-    'http://localhost:3000',
-    'https://localhost:3000',
-    'https://mesto.soffeine.nomoredomains.xyz',
-    'http://mesto.soffeine.nomoredomains.xyz/',
-    'http://api.mesto/soffeine.nomoredomains.rocks',
-    'https://api.mesto/soffeine.nomoredomains.rocks',
-  ],
-  methods: ['GET', 'HEAD', 'PUT', 'PATCH', 'POST', 'DELETE'],
-  preflightContinue: false,
-  optionsSuccessStatus: 204,
-  allowedHeaders: ['Content-Type', 'origin', 'Authorization'],
-  credentials: true,
-};
+// const options = {
+//   origin: [
+//     'http://localhost:3000',
+//     'https://localhost:3000',
+//     'https://mesto.soffeine.nomoredomains.xyz',
+//     'http://mesto.soffeine.nomoredomains.xyz/',
+//     'http://api.mesto/soffeine.nomoredomains.rocks',
+//     'https://api.mesto/soffeine.nomoredomains.rocks',
+//   ],
+//   methods: ['GET', 'HEAD', 'PUT', 'PATCH', 'POST', 'DELETE'],
+//   preflightContinue: false,
+//   optionsSuccessStatus: 204,
+//   allowedHeaders: ['Content-Type', 'origin', 'Authorization'],
+//   credentials: true,
+// };
 
 const app = express();
 const bodyParser = require('body-parser');
@@ -36,7 +36,7 @@ mongoose.connect('mongodb://localhost:27017/mestodb', {
   useNewUrlParser: true,
 });
 
-app.use('*', cors(options));
+app.use('*', cors());
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
