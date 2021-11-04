@@ -10,7 +10,7 @@ const options = {
     'https://mesto.soffeine.nomoredomains.xyz',
     'http://mesto.soffeine.nomoredomains.xyz',
     'http://84.201.174.203',
-    'https://84.201.174.203',
+    'http://84.201.174.203',
   ],
   methods: ['GET', 'HEAD', 'PUT', 'PATCH', 'POST', 'DELETE'],
   credentials: true,
@@ -40,10 +40,11 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 app.use(requestLogger);
 
-app.post('/sign-up', signupValidation, createUser);
-app.post('/sign-in', loginValidation, login);
+app.post('/signup', signupValidation, createUser);
+app.post('/signin', loginValidation, login);
 
 app.use(auth);
+
 app.use('/users', userRoutes);
 app.use('/cards', cardRoutes);
 app.use((req, res, next) => {
