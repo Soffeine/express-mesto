@@ -1,25 +1,25 @@
 const express = require('express');
 
 const PORT = 3000;
-const app = express();
-const bodyParser = require('body-parser');
-const mongoose = require('mongoose');
-const { errors } = require('celebrate');
 const cors = require('cors');
 
 const options = {
   origin: [
     'http://localhost:3000',
+    'https://localhost:3000',
     'https://mesto.soffeine.nomoredomains.xyz',
     'http://mesto.soffeine.nomoredomains.xyz',
+    'http://84.201.174.203',
+    'https://84.201.174.203',
   ],
   methods: ['GET', 'HEAD', 'PUT', 'PATCH', 'POST', 'DELETE'],
-  preflightContinue: false,
-  optionsSuccessStatus: 204,
-  allowedHeaders: ['Content-Type', 'origin', 'Authorization'],
   credentials: true,
 };
 
+const app = express();
+const bodyParser = require('body-parser');
+const mongoose = require('mongoose');
+const { errors } = require('celebrate');
 const userRoutes = require('./routes/users');
 const cardRoutes = require('./routes/cards');
 const { login, createUser } = require('./controllers/users');
@@ -44,7 +44,6 @@ app.post('/sign-up', signupValidation, createUser);
 app.post('/sign-in', loginValidation, login);
 
 app.use(auth);
-
 app.use('/users', userRoutes);
 app.use('/cards', cardRoutes);
 app.use((req, res, next) => {
