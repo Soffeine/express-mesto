@@ -6,13 +6,13 @@ const cors = require('cors');
 const options = {
   origin: [
     'http://localhost:3000',
-    'https://localhost:3000',
     'https://mesto.soffeine.nomoredomains.xyz',
-    'http://mesto.soffeine.nomoredomains.xyz',
-    'http://84.201.174.203',
-    'http://84.201.174.203',
+    'https://mesto.soffeine.nomoredomains.xyz/',
   ],
   methods: ['GET', 'HEAD', 'PUT', 'PATCH', 'POST', 'DELETE'],
+  preflightContinue: false,
+  optionsSuccessStatus: 204,
+  allowedHeaders: ['Content-Type', 'origin', 'Authorization'],
   credentials: true,
 };
 
