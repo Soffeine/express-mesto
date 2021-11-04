@@ -10,6 +10,7 @@ const cardRoutes = require('./routes/cards');
 const { login, createUser } = require('./controllers/users');
 const { auth } = require('./middlewares/auth');
 const { loginValidation, signupValidation } = require('./middlewares/validation');
+const { requestLogger, errorLogger } = require('./middlewares/logger');
 
 const NotFoundError = require('./errors/not-found-error');
 
@@ -19,8 +20,11 @@ mongoose.connect('mongodb://localhost:27017/mestodb', {
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
-app.post('/signup', signupValidation, createUser);
-app.post('/signin', loginValidation, login);
+
+app.use(requestLogger);
+
+app.post('/sign-up', signupValidation, createUser);
+app.post('/sign-in', loginValidation, login);
 
 app.use(auth);
 
@@ -29,6 +33,8 @@ app.use('/cards', cardRoutes);
 app.use((req, res, next) => {
   next(new NotFoundError('Такого запроса не существует'));
 });
+
+app.use(errorLogger);
 
 app.use(errors());
 
