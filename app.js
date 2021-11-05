@@ -31,7 +31,7 @@ app.use(cors({
   credentials: true,
   origin: allowedCors,
   methods: allowedMethods,
-  allowedHeaders: ['Content-Type', 'origin', 'Authorization'],
+  allowedHeaders: ['Content-Type', 'origin', 'Authorization', 'Access-Control-Allow-Credentials'],
   preflightContinue: false,
   optionsSuccessStatus: 204,
 }));
