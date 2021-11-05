@@ -1,23 +1,32 @@
 const express = require('express');
 
 const PORT = 3000;
-const cors = require('cors');
+// const cors = require('cors');
 
-const options = {
-  origin: [
-    'http://localhost:3000',
-    'https://localhost:3000',
-    'https://mesto.soffeine.nomoredomains.xyz',
-    'http://mesto.soffeine.nomoredomains.xyz/',
-    'http://api.mesto/soffeine.nomoredomains.rocks',
-    'https://api.mesto/soffeine.nomoredomains.rocks',
-  ],
-  methods: ['GET', 'HEAD', 'PUT', 'PATCH', 'POST', 'DELETE'],
-  preflightContinue: false,
-  optionsSuccessStatus: 204,
-  allowedHeaders: ['Content-Type', 'origin', 'Authorization', 'Access-Control-Allow-Headers'],
-  credentials: true,
-};
+// const options = {
+//   origin: [
+//     'http://localhost:3000',
+//     'https://localhost:3000',
+//     'https://mesto.soffeine.nomoredomains.xyz',
+//     'http://mesto.soffeine.nomoredomains.xyz/',
+//     'http://api.mesto/soffeine.nomoredomains.rocks',
+//     'https://api.mesto/soffeine.nomoredomains.rocks',
+//   ],
+//   methods: ['GET', 'HEAD', 'PUT', 'PATCH', 'POST', 'DELETE'],
+//   preflightContinue: false,
+//   optionsSuccessStatus: 204,
+//   allowedHeaders: ['Content-Type', 'origin', 'Authorization', 'Access-Control-Allow-Headers'],
+//   credentials: true,
+// };
+
+const allowedCors = [
+  'http://localhost:3000',
+  'https://localhost:3000',
+  'https://mesto.soffeine.nomoredomains.xyz',
+  'http://mesto.soffeine.nomoredomains.xyz/',
+  'http://api.mesto/soffeine.nomoredomains.rocks',
+  'https://api.mesto/soffeine.nomoredomains.rocks',
+];
 
 const app = express();
 const bodyParser = require('body-parser');
@@ -32,8 +41,22 @@ const { requestLogger, errorLogger } = require('./middlewares/logger');
 
 const NotFoundError = require('./errors/not-found-error');
 
-app.use('*', cors(options));
-app.use(cors());
+// app.use('*', cors(options));
+
+app.use((req, res, next) => {
+  const { origin } = req.headers;
+  const { method } = req;
+  const allowedMethods = ['GET', 'HEAD', 'PUT', 'PATCH', 'POST', 'DELETE'];
+  const requestHeaders = req.headers['access-control-request-headers'];
+  if (allowedCors.includes(origin)) {
+    res.header('Access-Control-Allow-Origin', origin);
+  } else if (method === 'OPTIONS') {
+    res.header('Access-Control-Allow-Methods', allowedMethods);
+    res.header('Access-Control-Allow-Headers', requestHeaders);
+  }
+
+  next();
+});
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
