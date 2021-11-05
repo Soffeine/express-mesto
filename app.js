@@ -43,7 +43,7 @@ const { requestLogger, errorLogger } = require('./middlewares/logger');
 
 const NotFoundError = require('./errors/not-found-error');
 
-app.use(cors({
+app.use('*', cors({
   credentials: true,
   origin: allowedCors,
   methods: allowedMethods,
