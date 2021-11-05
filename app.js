@@ -48,6 +48,8 @@ app.use(cors({
   origin: allowedCors,
   methods: allowedMethods,
   allowedHeaders: ['Content-Type', 'origin', 'Authorization'],
+  preflightContinue: false,
+  optionsSuccessStatus: 204,
 }));
 
 app.use(bodyParser.json());
