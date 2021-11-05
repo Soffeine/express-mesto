@@ -3,22 +3,6 @@ const express = require('express');
 const PORT = 3000;
 const cors = require('cors');
 
-// const options = {
-//   origin: [
-//     'http://localhost:3000',
-//     'https://localhost:3000',
-//     'https://mesto.soffeine.nomoredomains.xyz',
-//     'http://mesto.soffeine.nomoredomains.xyz/',
-//     'http://api.mesto/soffeine.nomoredomains.rocks',
-//     'https://api.mesto/soffeine.nomoredomains.rocks',
-//   ],
-//   methods: ['GET', 'HEAD', 'PUT', 'PATCH', 'POST', 'DELETE'],
-//   preflightContinue: false,
-//   optionsSuccessStatus: 204,
-//   allowedHeaders: ['Content-Type', 'origin', 'Authorization', 'Access-Control-Allow-Headers'],
-//   credentials: true,
-// };
-
 const allowedCors = [
   'http://localhost:3000',
   'https://localhost:3000',
@@ -43,7 +27,7 @@ const { requestLogger, errorLogger } = require('./middlewares/logger');
 
 const NotFoundError = require('./errors/not-found-error');
 
-app.use('*', cors({
+app.use(cors({
   credentials: true,
   origin: allowedCors,
   methods: allowedMethods,
