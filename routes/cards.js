@@ -18,8 +18,8 @@ cardRouter.post('/', newCardValidation, createCard);
 
 cardRouter.delete('/:cardId', cardIdValidation, deleteCard);
 
-cardRouter.put('/likes/:cardId', cardIdValidation, putLike);
+cardRouter.put('/:cardId/likes', cardIdValidation, putLike);
 
-cardRouter.delete('/likes/:cardId', cardIdValidation, deleteLike);
+cardRouter.delete('/:cardId/likes', cardIdValidation, deleteLike);
 
 module.exports = cardRouter;
