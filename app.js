@@ -28,6 +28,10 @@ const { requestLogger, errorLogger } = require('./middlewares/logger');
 
 const NotFoundError = require('./errors/not-found-error');
 
+mongoose.connect('mongodb://localhost:27017/mestodb', {
+  useNewUrlParser: true,
+});
+
 app.use(cors({
   credentials: true,
   origin: allowedCors,
@@ -72,10 +76,6 @@ app.use((err, req, res, next) => {
       : message,
   });
   next();
-});
-
-mongoose.connect('mongodb://localhost:27017/mestodb', {
-  useNewUrlParser: true,
 });
 
 app.listen(PORT, () => {
